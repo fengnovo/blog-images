@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    #d::backdrop {
+        background: rgba(0, 0, 0, .3);
+    }
+    
+    #b {
+        position: fixed;
+        margin: auto;
+        inset: 0;
+        width: fit-content;
+        height: fit-content;
+        display: block;
+        visibility: hidden;
+        opacity: 0;
+        transform: translateY(100px);
+        transition: .2s;
+    }
+    
+    #b[open] {
+        visibility: visible;
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    #abutton {
+        animation: throttle 2s step-end forwards;
+    }
+    
+    #abutton:active {
+        animation: none;
+    }
+    
+    @keyframes throttle {
+        from {
+            pointer-events: none;
+        }
+        to {
+            pointer-events: all;
+        }
+    }
+</style>
+
+<body>
+    <button onclick="document.getElementById('d').showModal()">打开d dialog</button>
+    <button onclick="document.getElementById('c').show()">打开c dialog</button>
+    <button onclick="document.getElementById('b').show()">打开b dialog</button>
+    <dialog id="d">
+        <span>Hello</span>
+        <button onclick="document.getElementById('d').close()">关闭</button>
+    </dialog>
+    <dialog id="c">
+        <span>Hello</span>
+        <button onclick="document.getElementById('c').close()">关闭</button>
+    </dialog>
+    <dialog id="b">
+        <span>Hello</span>
+        <button onclick="document.getElementById('b').close()">关闭</button>
+    </dialog>
+    <pre>
+    通过showModal打开的模态弹窗，会生成顶层特性 top-layer，隔离于html之外，所以比z-index 级别更高
+    通过show方法打开的普通弹窗，不会生成
+
+    1.dialog 的打开和关闭方法很迷惑，分别是show() / close()
+    2.dialog中表单元素在添加method=dialog属性之后，只要触发表单提交就会自动关闭弹窗，无需额外 js
+    3.通过showModal()可以打开模态弹窗，并且后打开的弹窗永远比先打开的弹窗层级要高，无需手动计算层级
+    4.打开弹窗会自动聚焦到弹窗内的第一个可聚焦元素，方便快速输入
+    5.模态弹窗的焦点不会聚焦到弹窗外部，这和inert特性比较类似
+    6.模态弹窗其实是渲染到了html文档流之外，一个叫#top-layer的层级上，因此不会受到原父容器的影响
+    7.button value="AAA">提交</button>提交后可以打印弹窗的returnValue
+    </pre>
+
+
+    <h4>冻结属性inert</h4>
+
+    <div inert>
+        <p>`inert`是 HTMLElement 的一个布尔属性，意为"惰性"，简单来说，可以禁用一切交互</p>
+        <a href="/link">link</a>
+        <button>button1</button>
+        <button>button2</button>
+    </div>
+
+    <pre>
+以前的处理方式，pinter-events和tabindex=-1的结合，阻止鼠标和键盘行为
+a{
+  pointer-events: none;
+}
+《a tabindex="-1" href="/xxx"》《/a》
+或者 a.href = ''
+
+现在可以 《a inert href="/xxx"》《/a》
+
+inert是一个 HTMLElement 属性，可以禁用一切用户交互，非常彻底，就像“冻结”了一样
+inert是一个布尔属性，只要存在该属性就是true，否则为false
+inert可以很方便的禁用a链接，也包括其他任意元素
+inert可以很方便的控制焦点的作用范围，让弹窗内的焦点不会跳到外部
+    </pre>
+
+    <button id="abutton" onclick="console.log('保存')">保存</button>
+
+    <pre>
+    button{
+        animation: throttle 2s step-end forwards;
+    }
+    button:active{
+        animation: none;
+    }
+    @keyframes throttle {
+        from {
+            pointer-events: none;
+        }
+        to {
+            pointer-events: all;
+        }
+    }
+    </pre>
+
+
+
+    <pre>
+        html{
+            scroll-padding: 6rem
+        }
+    </pre>
+</body>
+
+</html>
